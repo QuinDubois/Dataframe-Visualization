@@ -1,0 +1,107 @@
+/* Globals and Imports */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@200;400;600&display=swap');
+
+:root {
+    --page-background-color: #212127;
+    --light-content-color: #EFEFEF;
+    --text-primary-color: #E4E4FA;
+    --panel-background-color: #424257;
+    --panel-dark-color: #343444;
+}
+
+/* Base Styles
+------------------------------------------------------*/
+html {
+    font-size: 50%;
+    background: var(--page-background-color);
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0;
+
+}
+
+body {
+    font-size: 1.5rem;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 400;
+    color: var(--text-primary-color)
+}
+
+
+/* Elements
+------------------------------------------------------*/
+h1 {
+
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 98vw;
+    margin: 0px auto;
+    background-color: var(--page-background-color);
+    justify-content: center;
+}
+
+.inner-container {
+    display: grid;
+    width: 100vw;
+}
+
+.content {
+
+}
+
+.panel {
+    border-radius: 1em;
+    background-color: var(--panel-background-color);
+    box-shadow: var(--panel-dark-color) 0px 10px;
+}
+
+.animated-panel {
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+
+
+/* Mobile specifications
+------------------------------------------------------*/
+@media only screen and (max-width: 1250px) {
+    .inner-container {
+        grid-template-columns: 100%;
+    }
+
+    .panel {
+        min-width: 90%;
+        min-height: 10em;
+        padding: 1em;
+        margin: 1em;
+    }
+    
+}
+
+/* Desktop specifications
+------------------------------------------------------*/
+@media (min-width: 1251px) {
+    .inner-container {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .panel {
+        min-width: 45%;
+        min-height: 10em;
+        padding: 1em;
+        margin: 1em;
+    }
+
+    .wide-panel {
+        grid-column-start: 1;
+        grid-column-end: 3;
+    }
+
+}
