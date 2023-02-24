@@ -3,13 +3,17 @@ import random as rand
 import numpy as np
 import pandas as pd
 
+'''
+This file serves to generate pseudo-random datasets for demonstration purposes in the Dashboard app.
+- Generates a csv file with fields "date", "value", and "ones" of length determined by 'data_length'
+'''
+
 
 def main():
 
     data_length = 100000
 
     df = pd.DataFrame({'ones': np.ones(data_length)})
-    # data = np.random.random_sample(data_length)
     data = []
     num = 50
     for i in range(data_length):
