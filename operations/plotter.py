@@ -12,9 +12,9 @@ from resources.style_imports import STYLES, trace_styles
 def plot_timeseries(df: pd.DataFrame = None, time_field='time', data_field='value') -> go.Figure:
     if df is None:
         return default_chart()
-
     else:
         fig = go.Figure()
+
         fig.add_trace(go.Scatter(
             x=df[time_field].values,
             y=df[data_field].values,
@@ -29,37 +29,42 @@ def plot_timeseries(df: pd.DataFrame = None, time_field='time', data_field='valu
 
 # Control plotting function
 def plot_control(df, time_field, data_field, segments, control_list, trend_toggle):
+    if df is None:
+        return default_chart()
+    else:
+        fig = go.Figure()
 
-    fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=df[time_field],
+            y=df[data_field],
+            mode='lines',
+            line_color=STYLES['line_colors'][0],
+            showlegend=False
+        ))
 
-    fig.add_trace(go.Scatter(x=df[time_field],
-                             y=df[data_field],
-                             mode='lines',
-                             line_color=STYLES['line_colors'][0],
-                             showlegend=False
-                             ))
+        print_trend = True
 
-    print_trend = True
-
-    for key in control_list:
-        if key in ['trending up', 'trending down'] and print_trend:
-            fig = plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control_list)
-            print_trend = False
-        else:
-            if key in ['trending up', 'trending down']:
-                pass
+        for key in control_list:
+            if key in ['trending up', 'trending down'] and print_trend:
+                fig = plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control_list)
+                print_trend = False
             else:
-                key_filter = key + ' mask'
-                df_by_filter = df.loc[df[key_filter] == 1]
-                fig.add_trace(go.Scatter(x=df_by_filter[time_field],
-                                         y=df_by_filter[data_field],
-                                         mode='markers',
-                                         name=key,
-                                         marker_color=trace_styles[key],
-                                         showlegend=True))
+                if key in ['trending up', 'trending down']:
+                    pass
+                else:
+                    key_filter = key + ' mask'
+                    df_by_filter = df.loc[df[key_filter] == 1]
+                    fig.add_trace(go.Scatter(
+                        x=df_by_filter[time_field],
+                        y=df_by_filter[data_field],
+                        mode='markers',
+                        name=key,
+                        marker_color=trace_styles[key],
+                        showlegend=True
+                    ))
 
-    fig = style_chart(fig, data_field)
-    return fig
+        fig = style_chart(fig, data_field)
+        return fig
 
 
 def plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control_list):

@@ -15,7 +15,7 @@ def aggregate_dataframe(df, time_field, data_field, agg_type) -> pd.DataFrame:
     if agg_type == 'mean':
         agg_df = temp_df.groupby(agg_field).mean().reset_index()
 
-    # TODO: Solve some of the commented out code below being weird.
+    # TODO: Improve on dataframe grouping for below cases.
 
     # if the dataset is of even length, round down to the next closest median.
     if agg_type == "median":
