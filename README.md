@@ -1,4 +1,7 @@
 # Dataframe Visualization
- A dashboard to visualize Pandas dataframes, built as a demonstration of Plotly Dash.
+ An example dashboard built with permission to demonstrate skills gained through my former internship with the Maine EPSCoR BARRACUDA Grant team. 
+The official dashboard created during the internship can be found at https://dev.biobarracuda.org/
  
- TODO: Refactor to have client-side callbacks so that I can host the dashboard on github pages.
+### Future Changes:
+#### Unscheduled:
+- Refactor call-backs to clientside code so that I can host the dashboard on GitHub Pages.
