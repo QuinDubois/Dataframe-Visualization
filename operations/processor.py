@@ -40,7 +40,7 @@ def aggregate_dataframe(df, time_field, data_field, agg_type) -> pd.DataFrame:
 
 
 # Data Sorter for Control plot
-def data_sort(df, time_field, data_field, trend_size, deviation_coefficient, control_options, trend_toggle):
+def data_sort(df, data_field, trend_size, deviation_coefficient, control_options):
     avg = np.average(df[data_field])
     std = np.std(df[data_field])
     segments = []

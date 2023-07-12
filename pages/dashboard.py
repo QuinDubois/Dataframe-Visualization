@@ -227,12 +227,10 @@ def update_chart_contents(
     elif chart_type == 'control':
         df_sorted, segments = data_sort(
             df_by_aggregate,
-            'year',
             data_name,
             trend_size,
             deviation_coefficient,
             control_list,
-            trend_toggle
         )
         fig = plot_control(df_sorted, 'year', data_name, segments, control_list, trend_toggle)
 

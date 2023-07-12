@@ -1,6 +1,5 @@
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-import numpy as np
 import plotly.graph_objects as go
 import statsmodels.api as sm
 import datetime
@@ -8,7 +7,7 @@ import datetime
 from resources.style_imports import STYLES, trace_styles
 
 
-# Simple line plot that only requires two variables.
+# Simple temporal line plot.
 def plot_timeseries(df: pd.DataFrame = None, time_field='time', data_field='value') -> go.Figure:
     if df is None:
         return default_chart()
@@ -49,9 +48,7 @@ def plot_control(df, time_field, data_field, segments, control_list, trend_toggl
                 fig = plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control_list)
                 print_trend = False
             else:
-                if key in ['trending up', 'trending down']:
-                    pass
-                else:
+                if key not in ['trending up', 'trending down']:
                     key_filter = key + ' mask'
                     df_by_filter = df.loc[df[key_filter] == 1]
                     fig.add_trace(go.Scatter(
@@ -77,6 +74,7 @@ def plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control
         else:
             segment['serial_time'] = segment[time_field]
 
+        # Fit serialized time values in order to display trends properly
         x = sm.add_constant(segment['serial_time'])
         model = sm.OLS(segment[data_field], x).fit()
         segment['fitted_values'] = model.fittedvalues
@@ -87,32 +85,15 @@ def plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control
         trend_name = "Trending Up" if model.params['serial_time'] > 0 else "Trending Down"
 
         # Determine whether the current segment should be printed or not.
-        print_trend = False
-
         if trend_toggle:
             if ('trending up' in control_list and model.params['serial_time'] > 0) \
                     or ('trending down' in control_list and model.params['serial_time'] <= 0):
-                print_trend = True
-            else:
-                pass
+                fig = add_trend_trace(fig, time_field, segment, trend_name, fit_color)
         else:
             if model.f_pvalue < 0.05:
                 if ('trending up' in control_list and model.params['serial_time'] > 0) \
                         or ('trending_down' in control_list and model.params['serial_time'] <= 0):
-                    print_trend = True
-                else:
-                    pass
-            else:
-                pass
-
-        if print_trend:
-            fig.add_trace(go.Scatter(
-                x=segment[time_field],
-                y=segment['fitted_values'],
-                mode='lines',
-                line=dict(color=fit_color),
-                name=trend_name,
-            ))
+                    fig = add_trend_trace(fig, time_field, segment, trend_name, fit_color)
 
     # Ensure duplicate legend items get removed
     legend_names = set()
@@ -124,10 +105,20 @@ def plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control
     return fig
 
 
-# I needed a reusable empty chart to fill space.
 def default_chart() -> go.Figure:
     fig = go.Figure({'data': {'x': [0], 'y': [0]}})
     fig = style_chart(fig, 'data')
+    return fig
+
+
+def add_trend_trace(fig: go.Figure, time_field, segment, trend_name, fit_color) -> go.Figure:
+    fig.add_trace(go.Scatter(
+        x=segment[time_field],
+        y=segment['fitted_values'],
+        mode='lines',
+        line=dict(color=fit_color),
+        name=trend_name,
+    ))
     return fig
 
 
