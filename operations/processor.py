@@ -3,7 +3,7 @@ import numpy as np
 
 
 # Aggregate process
-def aggregate_dataframe(df, time_field, data_field, agg_type) -> pd.DataFrame:
+def aggregate_dataframe(df, data_field, time_field, agg_type) -> pd.DataFrame:
     temp_df = df
     agg_df = pd.DataFrame()
     agg_field = time_field
@@ -40,12 +40,12 @@ def aggregate_dataframe(df, time_field, data_field, agg_type) -> pd.DataFrame:
 
 
 # Data Sorter for Control plot
-def data_sort(df, data_field, trend_size, deviation_coefficient, control_options):
+def data_sort(df, data_field, trend_size, deviation_coefficient, enabled_control_list):
     avg = np.average(df[data_field])
     std = np.std(df[data_field])
     segments = []
 
-    for key in control_options:
+    for key in enabled_control_list:
         if key == 'above average':
             df[key + ' mask'] = np.where(df[data_field].values >= avg, 1, 0)
         if key == 'below average':

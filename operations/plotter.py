@@ -27,7 +27,7 @@ def plot_timeseries(df: pd.DataFrame = None, time_field='time', data_field='valu
 
 
 # Control plotting function
-def plot_control(df, time_field, data_field, segments, control_list, trend_toggle):
+def plot_control(df, data_field, time_field, segments, enable_all_trendlines, control_list):
     if df is None:
         return default_chart()
     else:
@@ -45,7 +45,7 @@ def plot_control(df, time_field, data_field, segments, control_list, trend_toggl
 
         for key in control_list:
             if key in ['trending up', 'trending down'] and print_trend:
-                fig = plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control_list)
+                fig = plot_trends(fig, df, data_field, time_field, segments, enable_all_trendlines, control_list)
                 print_trend = False
             else:
                 if key not in ['trending up', 'trending down']:
@@ -64,7 +64,7 @@ def plot_control(df, time_field, data_field, segments, control_list, trend_toggl
         return fig
 
 
-def plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control_list):
+def plot_trends(fig, df, data_field, time_field, segments, enable_all_trendlines, enabled_control_list):
     for start_idx, end_idx in zip(segments[:-1], segments[1:]):
         segment = df.iloc[start_idx:end_idx + 1, :].copy()
 
@@ -76,23 +76,23 @@ def plot_trends(fig, df, segments, data_field, time_field, trend_toggle, control
 
         # Fit serialized time values in order to display trends properly
         x = sm.add_constant(segment['serial_time'])
-        model = sm.OLS(segment[data_field], x).fit()
-        segment['fitted_values'] = model.fittedvalues
+        fitted_segment = sm.OLS(segment[data_field], x).fit()
+        segment['fitted_values'] = fitted_segment.fittedvalues
 
-        fit_color = trace_styles['trending up'] if model.params['serial_time'] > 0 \
+        fit_color = trace_styles['trending up'] if fitted_segment.params['serial_time'] > 0 \
             else trace_styles['trending down']
 
-        trend_name = "Trending Up" if model.params['serial_time'] > 0 else "Trending Down"
+        trend_name = "Trending Up" if fitted_segment.params['serial_time'] > 0 else "Trending Down"
 
         # Determine whether the current segment should be printed or not.
-        if trend_toggle:
-            if ('trending up' in control_list and model.params['serial_time'] > 0) \
-                    or ('trending down' in control_list and model.params['serial_time'] <= 0):
+        if enable_all_trendlines:
+            if ('trending up' in enabled_control_list and fitted_segment.params['serial_time'] > 0) \
+                    or ('trending down' in enabled_control_list and fitted_segment.params['serial_time'] <= 0):
                 fig = add_trend_trace(fig, time_field, segment, trend_name, fit_color)
         else:
-            if model.f_pvalue < 0.05:
-                if ('trending up' in control_list and model.params['serial_time'] > 0) \
-                        or ('trending_down' in control_list and model.params['serial_time'] <= 0):
+            if fitted_segment.f_pvalue < 0.05:
+                if ('trending up' in enabled_control_list and fitted_segment.params['serial_time'] > 0) \
+                        or ('trending_down' in enabled_control_list and fitted_segment.params['serial_time'] <= 0):
                     fig = add_trend_trace(fig, time_field, segment, trend_name, fit_color)
 
     # Ensure duplicate legend items get removed

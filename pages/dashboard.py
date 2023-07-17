@@ -1,11 +1,9 @@
 import dash
-from dash import html, dcc, callback, Input, Output, State
-import json
-import numpy as np
+from dash import html, dcc, callback, Input, Output
 import plotly.graph_objects as go
 import pandas as pd
 
-from resources.style_imports import STYLES, empty_chart_layout, trace_styles
+from resources.style_imports import empty_chart_layout, trace_styles
 
 from operations.plotter import plot_timeseries, plot_control
 from operations.processor import aggregate_dataframe, data_sort
@@ -206,8 +204,8 @@ def update_chart_contents(
         data_name,
         dataset_choice,
         chart_type,
-        control_list,
-        trend_toggle,
+        enabled_control_list,
+        enable_all_trendlines,
         trend_size,
         deviation_coefficient
 ) -> go.Figure:
@@ -220,7 +218,7 @@ def update_chart_contents(
         df = df_data
         time_field = 'date'
 
-    df_by_aggregate = aggregate_dataframe(df, time_field, data_name, agg_type)
+    df_by_aggregate = aggregate_dataframe(df, data_name, time_field, agg_type)
 
     if chart_type == 'temporal':
         fig = plot_timeseries(df_by_aggregate, 'year', data_name)
@@ -230,9 +228,9 @@ def update_chart_contents(
             data_name,
             trend_size,
             deviation_coefficient,
-            control_list,
+            enabled_control_list,
         )
-        fig = plot_control(df_sorted, 'year', data_name, segments, control_list, trend_toggle)
+        fig = plot_control(df_sorted, data_name, 'year', segments, enable_all_trendlines, enabled_control_list)
 
     return fig
 
